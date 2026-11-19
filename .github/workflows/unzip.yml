@@ -1,0 +1,36 @@
+name: Unzip tcga-survival-benchmark-Public File
+
+on:
+  workflow_dispatch: # Allow manual triggering from the Actions page
+
+jobs:
+  unzip:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Grant write permission to push extracted files back to the repository
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main # Force checkout of main branch where the ZIP lives
+
+      - name: Extract ZIP file
+        run: |
+          # Extract the ZIP file in the root directory to the current directory
+          unzip -o tcga-survival-benchmark-Public-main.zip
+          # Delete the original ZIP file (optional, uncomment the next line if you want to remove it)
+          # rm tcga-survival-benchmark-Public-main.zip
+
+      - name: Commit and push extracted files
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          # Check if there are file changes to avoid errors when there are no changes
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Auto-unzip tcga-survival-benchmark-Public-main.zip"
+            git push
+          fi
